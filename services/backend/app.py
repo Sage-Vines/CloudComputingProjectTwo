@@ -14,7 +14,7 @@ def grab_env_var(name: str, default: str = "") -> str:
   return os.environ.get(name, default)
 
 
-#global-ish config so the rest of the file doesnt need to keep threading env vars
+#global-ish config so rest of file doesnt need to keep threading env vars
 DB_CONFIG = {
     "host": grab_env_var("DATABASE_HOST", "postgres-db"),
     "dbname": grab_env_var("DATABASE_NAME", "app_db"),
@@ -25,8 +25,8 @@ DB_CONFIG = {
 
 
 def init_db():
-  """Create notes table on boot so the API never crashes on missing schema."""
-  # create the notes table if someone destroyed it, keeps demo resilient
+  """Create notes table on boot so API never crashes on missing schema."""
+  # create notes table if someone destroyed it, keeps demo resilient
   with psycopg.connect(**DB_CONFIG) as conn:
     conn.execute(
         """
@@ -42,7 +42,7 @@ def init_db():
 
 def fetch_newest_notes():
   """Return every note newest-first for frontend list"""
-  #grab everything newest first so the UI feels lively
+  #grab everything newest first so UI feels lively
   with psycopg.connect(**DB_CONFIG) as conn:
     with conn.cursor() as cur:
       cur.execute(
@@ -62,7 +62,7 @@ def fetch_newest_notes():
 
 def add_note_record(title: str, content: str):
   """Insert note & eturn new row so UI can refresh w/out roundtrips"""
-  # bare bones insert with a RETURNING so we can echo data back to the UI
+  # bare bones insert with a RETURNING so we can echo data back to UI
   with psycopg.connect(**DB_CONFIG) as conn:
     with conn.cursor() as cur:
       cur.execute(

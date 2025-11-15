@@ -1,4 +1,4 @@
-#share the database container & volume names
+#share database container & volume names
 #handy when doing docker cli work or verifying persistence
 output "container_name" {
   value= docker_container.this.name

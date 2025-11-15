@@ -1,5 +1,5 @@
-#cooks the backend container straight from registry and binds local code
-#since we bind mount the repo folder, docker never needs to rebuild for code tweaks
+#cooks backend container straight from registry and binds local code
+#since we bind mount repo folder, docker never needs to rebuild for code tweaks
 resource "docker_image" "this" {
   name= var.backend_image_name
   keep_locally = true

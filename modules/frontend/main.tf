@@ -1,5 +1,5 @@
-# builds the nginx front door and points it at whatever backend we say
-#also shoves the static site in place so no extra image build needed
+# builds nginx front door and points it at whatever backend we say
+#also shoves static site in place so no extra image build needed
 resource "docker_image" "this" {
   name = var.frontend_image_name
   keep_locally = true

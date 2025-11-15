@@ -1,7 +1,7 @@
 #database inputs go here
 #root module translates human-readable terraform vars into postgres env vars
 variable "database_container_name" {
-  description = "Name of the Postgres container"
+  description = "Name of Postgres container"
   type = string
 }
 
@@ -32,7 +32,7 @@ variable "shared_network_name" {
 }
 
 variable "persistent_volume_name" {
-  description = "Name of the Docker volume for Postgres data"
+  description = "Name of Docker volume for Postgres data"
   type= string
 }
 
