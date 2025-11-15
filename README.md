@@ -32,7 +32,7 @@ This repo as a small “local cloud” that Terraform operates. It is just Terra
    - Docker Desktop or Engine running locally (I have Docker Desktop)
 2. **Then, you must Configure secrets**
    - Copy snippet above into `terraform.tfvars`
-   - Swap password for any password that you want (it gets piped into Postgres + the backend)
+   - Swap password for any password wanted
 3. **Then, you must provision Terraform**
    ```powershell
    terraform init   # I use powershell
