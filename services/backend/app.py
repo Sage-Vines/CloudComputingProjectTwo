@@ -1,4 +1,4 @@
-# stdlib web server, now stores notes in postgres without fancy frameworks
+#stdlib web server, now stores notes in postgres without fancy frameworks
 # intentionally scrappy so you can read it without a framework manual nearby
 import json
 import os
@@ -10,11 +10,11 @@ import psycopg
 
 
 def grab_env_var(name: str, default: str = "") -> str:
-  """Grab env vars with fallback so local dev isnt brittle."""
+  """Grab env vars w/ fallback so local dev isnt brittle."""
   return os.environ.get(name, default)
 
 
-# global-ish config so the rest of the file doesnt need to keep threading env vars
+#global-ish config so the rest of the file doesnt need to keep threading env vars
 DB_CONFIG = {
     "host": grab_env_var("DATABASE_HOST", "postgres-db"),
     "dbname": grab_env_var("DATABASE_NAME", "app_db"),
@@ -61,7 +61,7 @@ def fetch_newest_notes():
 
 
 def add_note_record(title: str, content: str):
-  """Insert note & eturn the new row so UI can refresh w/out round-trips."""
+  """Insert note & eturn new row so UI can refresh w/out roundtrips"""
   # bare bones insert with a RETURNING so we can echo data back to the UI
   with psycopg.connect(**DB_CONFIG) as conn:
     with conn.cursor() as cur:
@@ -80,7 +80,7 @@ def add_note_record(title: str, content: str):
 
 
 def edit_note_record(note_id: int, title: str, content: str):
-  """Persist edits; returns None if row vanished"""
+  """Persist edits, returns None if row vanished"""
   with psycopg.connect(**DB_CONFIG) as conn:
     with conn.cursor() as cur:
       cur.execute(
@@ -106,7 +106,7 @@ def edit_note_record(note_id: int, title: str, content: str):
 
 
 def remove_note_record(note_id: int):
-  """Delete a note and report whether anything actually disappeared."""
+  """Delete note and report whether anything actually disappeared"""
   with psycopg.connect(**DB_CONFIG) as conn:
     with conn.cursor() as cur:
       cur.execute("DELETE FROM notes WHERE id = %s;", (note_id,))
@@ -116,7 +116,7 @@ def remove_note_record(note_id: int):
 
 
 def extract_note_id(path: str) -> int | None:
-  """Extract note id from routes like /api/notes/123 and ignore noise."""
+  """Extract note id from routes like api notes i123 and ignore noise"""
   #accepts /api/notes/123 and shrugs at bad input instead of crashing
   parts = path.rstrip("/").split("/")
   if len(parts) == 4 and parts[1] == "api" and parts[2] == "notes":
@@ -130,7 +130,7 @@ def extract_note_id(path: str) -> int | None:
 class Handler(BaseHTTPRequestHandler):
 
   def send_json_response(self, payload, status=200):
-    """Consistent JSON responses with length & type headers"""
+    """Consistent JSON responses w/ length & type headers"""
     body = json.dumps(payload).encode("utf-8")
     self.send_response(status)
     self.send_header("Content-Type", "application/json")
@@ -139,7 +139,7 @@ class Handler(BaseHTTPRequestHandler):
     self.wfile.write(body)
 
   def do_GET(self):
-    """Serve /api/notes listing"""
+    """Serve api notes listing"""
     path = urlparse(self.path).path
     if path == "/api/notes":
       notes = fetch_newest_notes()
@@ -188,7 +188,7 @@ class Handler(BaseHTTPRequestHandler):
     self.send_json_response(updated)
 
   def do_DELETE(self):  # noqa: N802
-    """Trash a note entirely."""
+    """Trash note entirely."""
     path = urlparse(self.path).path
     note_id = extract_note_id(path)
     if note_id is None:
@@ -212,7 +212,7 @@ class Handler(BaseHTTPRequestHandler):
       return None
 
   def normalize_note_payload(self, payload):
-    """Validate title/content presence & normalize whitespace"""
+    """Validates title & content presence & normalize whitespace"""
     title = (payload.get("title") or "").strip()
     content = (payload.get("content") or "").strip()
     if not title and not content:
