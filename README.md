@@ -1,6 +1,6 @@
-# Local Cloud With Terraform + Docker
+# Local Cloud With Terraform & Docker
 
-This repo as a small “local cloud” that Terraform operates. No Dockerfiles, no compose, just Terraform, the Docker provider, and a handful of configs that turn into a note-taking app with a modern UI, a Python API, and a Postgres database.
+This repo as a small “local cloud” that Terraform operates. It is just Terraform, the Docker provider, and config files that turn into a note-taking app with a modern UI, a Python API, and a Postgres database.
 
 - **Frontend (Nginx & static SPA)** – `services/frontend/site` holds the HTML/CSS/JS bundle. Terraform mounts that folder (plus `default.conf`) into the stock `nginx:alpine` image. The app lets you create, edit, and delete notes.
 - **Backend (Python standard library)** – `services/backend/app.py` is a framework-free HTTP server. Terraform bind-mounts the folder inside `python:3.11-slim`, the `start.sh` script installs `psycopg` on boot, and the API exposes `/api/notes` for GET/POST/PUT/DELETE with auto table creation.
@@ -18,10 +18,10 @@ This repo as a small “local cloud” that Terraform operates. No Dockerfiles, 
 
 ## Everything within the Repository
 
-- `main.tf`, `variables.tf`, `outputs.tf` – the orchestration brain.
+- `main.tf`, `variables.tf`, `outputs.tf` – what orchesrates everything
 - `modules/*` – one directory per component, each declaring its own provider requirements, inputs, and outputs.
-- `services/frontend/default.conf` – small nginx config that serves the SPA from `/usr/share/nginx/html` and proxies `/api/*` back to Python in the backend.
-- `services/frontend/site/` – the actual UI (HTML template, neon CSS, vanilla JavaScript logic with edit/delete buttons).
+- `services/frontend/default.conf` – small nginx config file which serves the SPA from `/usr/share/nginx/html` and proxies `/api/*` back to Python in the backend.
+- `services/frontend/site/` – the actual UI (HTML template, neon style, vanilla JavaScript logic with edit/delete buttons).
 - `services/backend/app.py` + `start.sh` – API plus boot script that installs dependencies on the fly so Dockerfiles are not actually needed.
 - `terraform.tfvars` – this file is created for password stashing.
 
