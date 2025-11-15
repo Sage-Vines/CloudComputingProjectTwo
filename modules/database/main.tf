@@ -1,23 +1,23 @@
 #sets up postgres plus a little volume so data doesnt vanish each restart
 resource "docker_volume" "data" {
-  name = var.volume_name
+  name = var.persistent_volume_name
 }
 
 resource "docker_image" "this" {
-  name = var.image_name
+  name = var.database_image_name
   keep_locally = true
 }
 
 resource "docker_container" "this" {
-  name= var.container_name
+  name= var.database_container_name
   image = docker_image.this.image_id
 
   restart = "unless-stopped"
 
   env = [
-    "POSTGRES_DB=${var.db_name}",
-    "POSTGRES_USER=${var.db_user}",
-    "POSTGRES_PASSWORD=${var.db_password}"
+    "POSTGRES_DB=${var.database_name_value}",
+    "POSTGRES_USER=${var.database_username}",
+    "POSTGRES_PASSWORD=${var.database_user_password}"
   ]
 
   mounts {
@@ -27,11 +27,11 @@ resource "docker_container" "this" {
   }
 
   networks_advanced {
-    name = var.network_name
+    name = var.shared_network_name
   }
 
   ports {
-    internal = var.port
+    internal = var.internal_database_port
   }
 }
 

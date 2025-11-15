@@ -10,7 +10,7 @@ import psycopg
 
 
 def grab_env_var(name: str, default: str = "") -> str:
-  """Grab env vars with a fallback so local dev isnt brittle."""
+  """Grab env vars with fallback so local dev isnt brittle."""
   return os.environ.get(name, default)
 
 
@@ -25,7 +25,7 @@ DB_CONFIG = {
 
 
 def init_db():
-  """Create the notes table on boot so the API never crashes on missing schema."""
+  """Create notes table on boot so the API never crashes on missing schema."""
   # create the notes table if someone destroyed it, keeps demo resilient
   with psycopg.connect(**DB_CONFIG) as conn:
     conn.execute(
@@ -41,7 +41,7 @@ def init_db():
 
 
 def fetch_newest_notes():
-  """Return every note newest-first for the frontend list."""
+  """Return every note newest-first for frontend list"""
   #grab everything newest first so the UI feels lively
   with psycopg.connect(**DB_CONFIG) as conn:
     with conn.cursor() as cur:
@@ -61,7 +61,7 @@ def fetch_newest_notes():
 
 
 def add_note_record(title: str, content: str):
-  """Insert a note and return the new row so UI can refresh without round-trips."""
+  """Insert note & eturn the new row so UI can refresh w/out round-trips."""
   # bare bones insert with a RETURNING so we can echo data back to the UI
   with psycopg.connect(**DB_CONFIG) as conn:
     with conn.cursor() as cur:
@@ -80,7 +80,7 @@ def add_note_record(title: str, content: str):
 
 
 def edit_note_record(note_id: int, title: str, content: str):
-  """Persist edits; returns None if the row vanished."""
+  """Persist edits; returns None if row vanished"""
   with psycopg.connect(**DB_CONFIG) as conn:
     with conn.cursor() as cur:
       cur.execute(
@@ -130,7 +130,7 @@ def extract_note_id(path: str) -> int | None:
 class Handler(BaseHTTPRequestHandler):
 
   def send_json_response(self, payload, status=200):
-    """Consistent JSON responses with length & type headers."""
+    """Consistent JSON responses with length & type headers"""
     body = json.dumps(payload).encode("utf-8")
     self.send_response(status)
     self.send_header("Content-Type", "application/json")
@@ -139,7 +139,7 @@ class Handler(BaseHTTPRequestHandler):
     self.wfile.write(body)
 
   def do_GET(self):
-    """Serve /api/notes listing."""
+    """Serve /api/notes listing"""
     path = urlparse(self.path).path
     if path == "/api/notes":
       notes = fetch_newest_notes()
@@ -148,7 +148,7 @@ class Handler(BaseHTTPRequestHandler):
       self.send_json_response({"error": "not found"}, status=404)
 
   def do_POST(self):
-    """Create a new note when the form submits."""
+    """Create a new note when form submits"""
     path = urlparse(self.path).path
     if path != "/api/notes":
       self.send_json_response({"error": "not found"}, status=404)
@@ -166,7 +166,7 @@ class Handler(BaseHTTPRequestHandler):
     self.send_json_response(note, status=201)
 
   def do_PUT(self):
-    """Update an existing note; body matches POST payload."""
+    """Update an existing note; body matches POST payload"""
     path = urlparse(self.path).path
     note_id = extract_note_id(path)
     if note_id is None:
@@ -202,7 +202,7 @@ class Handler(BaseHTTPRequestHandler):
       self.send_json_response({"error": "note was not found"}, status=404)
 
   def read_request_json(self):
-    """Best-effort JSON parser that surfaces 400s for bad payloads."""
+    """JSON parser that surfaces 400s for bad payloads"""
     length = int(self.headers.get("Content-Length", 0))
     data = self.rfile.read(length) if length else b"{}"
     try:
@@ -212,7 +212,7 @@ class Handler(BaseHTTPRequestHandler):
       return None
 
   def normalize_note_payload(self, payload):
-    """Validate title/content presence & normalize whitespace."""
+    """Validate title/content presence & normalize whitespace"""
     title = (payload.get("title") or "").strip()
     content = (payload.get("content") or "").strip()
     if not title and not content:
