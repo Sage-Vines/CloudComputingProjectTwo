@@ -22,17 +22,17 @@ This repo as a small “local cloud” that Terraform operates. It is just Terra
 - `modules/*` – one directory per component, each declaring its own provider requirements, inputs, and outputs.
 - `services/frontend/default.conf` – small nginx config file which serves SPA from `/usr/share/nginx/html` and proxies `/api/*` back to Python in backend.
 - `services/frontend/site/` – actual UI (HTML template, neon style, vanilla JavaScript logic with edit/delete buttons).
-- `services/backend/app.py` + `start.sh` – API plus boot script that installs dependencies on the fly so Dockerfiles are not actually needed.
+- `services/backend/app.py` & `start.sh` – API plus boot script that installs dependencies on the fly so Dockerfiles are not actually needed.
 - `terraform.tfvars` – this file is created for password stashing.
 
 ## Setup of Terraform project
 
 1. **First, you must install prerequisites**
-   - Terraform `>= 1.5`
+   - Terraform >= 1.5
    - Docker Desktop or Engine running locally (I have Docker Desktop)
 2. **Then, you must Configure secrets**
-   - Copy snippet above into `terraform.tfvars`
-   - Swap password for any password that you want (it gets piped into Postgres + the backend)
+   - Copy snippet above into terraform.tfvars
+   - Swap password for any password wanted
 3. **Then, you must provision Terraform**
    ```powershell
    terraform init   # I use powershell
@@ -42,11 +42,11 @@ This repo as a small “local cloud” that Terraform operates. It is just Terra
 4. **Using the app**
    - Visit `http://localhost:8080`
    - You may add, edit, or delete notes; everything persists in Postgres instantly
-   - Run `docker ps` to see the three containers on the `local-cloud` network
-   - `docker volume ls` will list `postgres-data`, proving the enhancement is alive
+   - Run docker ps to see the three containers on the local-cloud network
+   - docker volume ls will list postgres-data, proving the enhancement is alive
 5. **If you want to edit the code**
-   - Change frontend files under `services/frontend/site` or backend code in `services/backend`
-   - Re-run `terraform apply` and the containers restart with the new code because we bind-mount those folders
+   - Change frontend files under services/frontend/site or backend code in services/backend
+   - Re-run terraform apply and the containers restart with the new code because we bind-mount those folders
 
 ## If you want to clean up the code
 
@@ -54,4 +54,4 @@ This repo as a small “local cloud” that Terraform operates. It is just Terra
 terraform destroy #Powershell command
 ```
 
-- This command essentially tears down containers, network, and the pulled images related to the note-taking app. The `postgres-data` Docker volume intentionally sticks around so you can spin the stack back up without losing notes—delete it manually if you want a totally clean slate.
+- This command essentially tears down containers, network, and the pulled images related to the note-taking app. The postgres-data Docker volume intentionally sticks around so you can spin the stack back up without losing notes—delete it manually if you want a totally clean slate.
