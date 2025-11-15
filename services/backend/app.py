@@ -106,7 +106,7 @@ def edit_note_record(note_id: int, title: str, content: str):
 
 
 def remove_note_record(note_id: int):
-  """Delete note and report whether anything actually disappeared"""
+  """Delete note & report whether anything actually disappeared"""
   with psycopg.connect(**DB_CONFIG) as conn:
     with conn.cursor() as cur:
       cur.execute("DELETE FROM notes WHERE id = %s;", (note_id,))
@@ -116,7 +116,7 @@ def remove_note_record(note_id: int):
 
 
 def extract_note_id(path: str) -> int | None:
-  """Extract note id from routes like api notes i123 and ignore noise"""
+  """Extract note id from routes like api notes i123 & ignore noise"""
   #accepts /api/notes/123 and shrugs at bad input instead of crashing
   parts = path.rstrip("/").split("/")
   if len(parts) == 4 and parts[1] == "api" and parts[2] == "notes":

@@ -1,5 +1,5 @@
-# builds little private network where all containers gossip together
-# nothing fancy here: just a docker_network with a predictable subnet
+#builds little private network where all containers gossip together
+#just a docker_network with a predictable subnet
 resource "docker_network" "this" {
   name = var.network_name_label
 
