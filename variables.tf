@@ -1,4 +1,4 @@
-# Kinda messy list of knobs you can tweak, secrets go in tfvars
+# Kinda messy list of variables you can tweak, secrets go in tfvars
 #this whole file is basically control panel for local cloud
 variable "network_name" {
   description = "Custom Docker network"

@@ -1,4 +1,4 @@
-# all backend knobs live here, poke them carefully
+# all backend variables live here, poke them carefully
 variable "backend_image_name" {
   description = "Name for backend base image"
   type = string

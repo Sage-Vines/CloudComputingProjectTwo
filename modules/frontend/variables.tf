@@ -1,4 +1,4 @@
-# front end knobs live here
+# front end varfiables live here
 # terraform root passes absolute paths/ports into these so nginx knows what to serve & where
 variable "frontend_image_name" {
   description = "Frontend image name"
