@@ -2,19 +2,19 @@
 
 This repo as a small “local cloud” that Terraform operates. It is just Terraform, the Docker provider, and config files that turn into a note-taking app with a modern UI, a Python API, and a Postgres database.
 
-- **Frontend (Nginx & static SPA)** – `services/frontend/site` holds the HTML/CSS/JS bundle. Terraform mounts that folder (plus `default.conf`) into the stock `nginx:alpine` image. The app lets you create, edit, and delete notes.
-- **Backend (Python standard library)** – `services/backend/app.py` is a framework-free HTTP server. Terraform bind-mounts the folder inside `python:3.11-slim`, the `start.sh` script installs `psycopg` on boot, and the API exposes `/api/notes` for GET/POST/PUT/DELETE with auto table creation.
-- **Postgres Database** – real `postgres:15-alpine`, credentials arrive via variables, and the module attaches a named Docker volume so data sticks around between runs.
-- **Custom Docker network** – `local-cloud` keeps every container on the same subnet so service discovery is predictable.
+- **Frontend (Nginx & static SPA)** – services/frontend/site holds the HTML/CSS/JS bundle. Terraform mounts that folder along with default.conf into the stock nginx:alpine image. The app lets you create, edit, and delete notes.
+- **Backend (Python)** – services/backend/app.py is a framework-free HTTP server. Terraform bind-mounts the folder inside python:3.11-slim, the start.sh script installs psycopg on boot, and the API exposes /api/notes for GET/POST/PUT/DELETE with auto table creation.
+- **Postgres Database** – real postgres:15-alpine, credentials arrive via variables, and the module attaches a named Docker volume so data sticks around between runs.
+- **Custom Docker network** – local-cloud keeps every container on the same subnet so service discovery is predictable.
 
 ## Requirements
 
 - **Separate Modules** – network, database, backend, and frontend are their own Terraform modules, so the root config just wires them together.
 - **docker_image / docker_container / docker_network** – each module uses the right resource types straight from the Docker provider, satisfying the spec.
-- **Secrets via `.tfvars`** – `database_password` is the only sensitive value and you feed it through `terraform.tfvars` Nothing secret lives within the actual code.
-- **Frontend on `localhost:8080`** – module variables pin the port mapping, so the SPA is always reachable on 8080 without extra flags.
-- **Custom network + dependency graph** – every container joins `module.network.name`, and Terraform’s `depends_on` keeps creation order tidy.
-- **Enhancement** – the database module provisions the `postgres-data` Docker volume for persistence, so your carefully typed notes don’t disappear when containers restart. Also, the UI and backend is customized to be a handy note-taking application. I also included reverse-proxying as a little bonus.
+- **Secrets** – database_password is the only sensitive value and you feed it through terraform.tfvars Nothing secret lives within the actual code.
+- **Frontend** – module variables pin the port mapping, so the SPA is always reachable on localhost:8080 without extra flags.
+- **Custom network & dependency graph** – every container joins module.network.name, and Terraform’s depends_on keeps creation order tidy.
+- **Enhancement** – the database module provisions the postgres-data Docker volume for persistence, so your carefully typed notes don’t disappear when containers restart. Also, the UI and backend is customized to be a handy note-taking application. I also included reverse-proxying as a little bonus.
 
 ## Everything within the Repository
 
