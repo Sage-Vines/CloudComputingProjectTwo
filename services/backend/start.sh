@@ -1,5 +1,5 @@
 #!/bin/sh
-# installs deps each boot, bit slow but keeps us dockerfile-free
+# installs deps each boot, bit slow but keeps us dockerfile free
 #terraform alone can run the show
 set -e
 
