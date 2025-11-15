@@ -7,31 +7,31 @@ resource "docker_image" "this" {
 
 #spins up python container, bind mounts app folder, and runs our start script
 #command & env fields get injected from root module so we can reuse this module again
-resource "docker_container" "this" {
-  name = var.backend_container_name
+resource "docker_container" "this"{
+  name =var.backend_container_name
   image = docker_image.this.image_id
 
   restart = "unless-stopped"
-  command = var.backend_start_command
+  command =var.backend_start_command
 
-  env = [
-    for k, v in var.backend_environment_values : "${k}=${v}"
+  env =[
+    for k,v in var.backend_environment_values : "${k}=${v}"
   ]
 
-  mounts {
+  mounts{
     target = "/app"
     source = var.backend_source_mount
-    type = "bind"
+    type ="bind"
   }
 
-  networks_advanced {
+  networks_advanced{
     name = var.shared_network_name
   }
 
   working_dir = "/app"
 
-  ports {
-    internal = var.backend_service_port
+  ports{
+    internal= var.backend_service_port
   }
 }
 

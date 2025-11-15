@@ -4,7 +4,7 @@ variable "backend_image_name" {
   type = string
 }
 
-variable "backend_container_name" {
+variable "backend_container_name"{
   description = "Backend container name"
   type= string
 }
@@ -19,13 +19,13 @@ variable "backend_source_mount" {
   type = string
 }
 
-variable "backend_start_command" {
+variable "backend_start_command"{
   description = "Command array used to start backend service"
   type = list(string)
   default = ["/bin/sh", "/app/start.sh"]
 }
 
-variable "backend_environment_values" {
+variable "backend_environment_values"{
   description = "Environment variables passed to container"
   type= map(string)
   default = {}

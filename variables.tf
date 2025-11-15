@@ -25,9 +25,9 @@ variable "backend_image" {
 }
 
 variable "frontend_image" {
-  description = "Image used for nginx frontend"
+  description ="Image used for nginx frontend"
   type = string
-  default = "nginx:alpine"
+  default ="nginx:alpine"
 }
 
 variable "database_image" {
@@ -43,7 +43,7 @@ variable "database_name" {
 }
 
 variable "database_user" {
-  description = "Database user"
+  description ="Database user"
   type = string
   default= "app_user"
 }

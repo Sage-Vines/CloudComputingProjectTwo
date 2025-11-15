@@ -40,7 +40,7 @@ module "database" {
   #postgres spins up first so the backend has somewhere to stash notes
   database_container_name = "postgres-db"
   database_image_name= var.database_image
-  database_name_value = var.database_name
+  database_name_value =var.database_name
   database_username= var.database_user
   database_user_password = var.database_password
   shared_network_name = module.network.name
@@ -54,8 +54,8 @@ module "backend" {
   #backend uses the stock python image; start.sh installs psycopg and runs app.py
   backend_image_name = var.backend_image
   backend_container_name = "backend-service"
-  backend_service_port = local.backend_internal_port
-  backend_source_mount = local.backend_code_path
+  backend_service_port =local.backend_internal_port
+  backend_source_mount =local.backend_code_path
   backend_start_command  = ["/bin/sh", "/app/start.sh"]
   backend_environment_values = {
     DATABASE_HOST = module.database.container_name
@@ -79,7 +79,7 @@ module "frontend" {
   nginx_config_path = local.frontend_config_path
   static_site_path = local.frontend_site_path
 
-  depends_on = [module.backend]
+  depends_on =[module.backend]
 }
 
 output "frontend_url" {

@@ -1,6 +1,6 @@
 #sets up postgres plus a little volume so data doesnt vanish each restart
 resource "docker_volume" "data" {
-  name = var.persistent_volume_name
+  name =var.persistent_volume_name
 }
 
 resource "docker_image" "this" {
@@ -23,11 +23,11 @@ resource "docker_container" "this" {
   mounts {
     target = "/var/lib/postgresql/data"
     source = docker_volume.data.name
-    type = "volume"
+    type ="volume"
   }
 
   networks_advanced {
-    name = var.shared_network_name
+    name =var.shared_network_name
   }
 
   ports {

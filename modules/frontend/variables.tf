@@ -21,7 +21,7 @@ variable "shared_network_name" {
 }
 
 variable "nginx_config_path" {
-  description = "Host path to nginx config file"
+  description ="Host path to nginx config file"
   type = string
 }
 
