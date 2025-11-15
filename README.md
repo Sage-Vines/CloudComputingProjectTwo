@@ -7,7 +7,7 @@ This repo as a small “local cloud” that Terraform operates. It is just Terra
 - **Postgres Database** – real postgres:15-alpine, credentials arrive via variables, and the module attaches a named Docker volume so data sticks around between runs.
 - **Custom Docker network** – local-cloud keeps every container on the same subnet so service discovery is predictable.
 
-## Requirements
+## Requirements Satisfied
 
 - **Separate Modules** – network, database, backend, and frontend are their own Terraform modules, so root config just wires them together.
 - **docker_image / docker_container / docker_network** – each module uses the right resource types straight from the Docker provider, satisfying the spec.
