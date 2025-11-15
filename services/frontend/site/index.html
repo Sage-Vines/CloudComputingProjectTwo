@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Lite Notes</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <!-- basic layout, not perfect but nice enough -->
+    <!-- sections below line up with CSS + JS so editing feels predictable -->
+    <main class="app">
+      <header>
+        <h1>Cloudy Notes</h1>
+        <p class="muted">Tiny note taker riding Terraform + Docker</p>
+      </header>
+
+      <section class="compose">
+        <label>
+          <span>Title</span>
+          <input id="title" placeholder="Meeting prep..." maxlength="80" />
+        </label>
+        <label>
+          <span>Details</span>
+          <textarea id="content" rows="4" placeholder="Drop your thoughts here"></textarea>
+        </label>
+        <div class="actions-row">
+          <button id="saveBtn">Save note</button>
+          <button id="cancelBtn" class="ghost" type="button" hidden>Cancel edit</button>
+        </div>
+      </section>
+
+      <section class="notes">
+        <h2>Recent notes</h2>
+        <ul id="notesList"></ul>
+      </section>
+    </main>
+
+    <!-- template powers the dynamic list created inside app.js -->
+    <template id="noteTemplate">
+      <li class="note">
+        <div>
+          <h3 class="note-title"></h3>
+          <p class="note-body"></p>
+        </div>
+        <div class="note-meta">
+          <span class="note-date"></span>
+          <div class="note-actions">
+            <button class="note-btn note-edit" type="button">Edit</button>
+            <button class="note-btn note-delete" type="button">Delete</button>
+          </div>
+        </div>
+      </li>
+    </template>
+
+    <script src="/app.js" type="module"></script>
+  </body>
+</html>
+
