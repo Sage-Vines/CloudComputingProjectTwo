@@ -1,27 +1,27 @@
 # Local Cloud With Terraform & Docker
 
-This repo as a small “local cloud” that Terraform operates. It is just Terraform, the Docker provider, and config files that turn into a note-taking app with a modern UI, a Python API, and a Postgres database.
+This repo as a small “local cloud” that Terraform operates. It is just Terraform, Docker provider, and config files that turn into a note-taking app with a modern UI, a Python API, and a Postgres database.
 
 - **Frontend (Nginx & static SPA)** – services/frontend/site holds the HTML/CSS/JS bundle. Terraform mounts that folder along with default.conf into the stock nginx:alpine image. The app lets you create, edit, and delete notes.
-- **Backend (Python)** – services/backend/app.py is a HTTP server which is free from frameworks. Terraform bind-mounts the folder inside python:3.11-slim, the start.sh script installs psycopg on boot, and the API exposes /api/notes for GET/POST/PUT/DELETE with auto table creation.
+- **Backend (Python)** – services/backend/app.py is a HTTP server which is free from frameworks. Terraform bind-mounts folder inside python:3.11-slim, the start.sh script installs psycopg on boot, and the API exposes /api/notes for GET/POST/PUT/DELETE with auto table creation.
 - **Postgres Database** – real postgres:15-alpine, credentials arrive via variables, and the module attaches a named Docker volume so data sticks around between runs.
 - **Custom Docker network** – local-cloud keeps every container on the same subnet so service discovery is predictable.
 
 ## Requirements
 
-- **Separate Modules** – network, database, backend, and frontend are their own Terraform modules, so the root config just wires them together.
+- **Separate Modules** – network, database, backend, and frontend are their own Terraform modules, so root config just wires them together.
 - **docker_image / docker_container / docker_network** – each module uses the right resource types straight from the Docker provider, satisfying the spec.
-- **Secrets** – database_password is the only sensitive value and you feed it through terraform.tfvars Nothing secret lives within the actual code.
-- **Frontend** – module variables pin the port mapping, so the SPA is always reachable on localhost:8080 without extra flags.
+- **Secrets** – database_password is only sensitive value and you feed it through terraform.tfvars Nothing secret lives within actual code.
+- **Frontend** – module variables pin port mapping, so SPA is always reachable on localhost:8080 without extra flags.
 - **Custom network & dependency graph** – every container joins module.network.name, and Terraform’s depends_on keeps creation order tidy.
-- **Enhancement** – the database module provisions the postgres-data Docker volume for persistence, so your carefully typed notes don’t disappear when containers restart. Also, the UI and backend is customized to be a handy note-taking application. I also included reverse-proxying as a little bonus.
+- **Enhancement** – database module provisions postgres-data Docker volume for persistence, so your carefully typed notes don’t disappear when containers restart. Also, UI and backend is customized to be a handy note-taking application. I also included reverse-proxying as a little bonus.
 
 ## Everything within the Repository
 
 - `main.tf`, `variables.tf`, `outputs.tf` – what orchesrates everything
 - `modules/*` – one directory per component, each declaring its own provider requirements, inputs, and outputs.
-- `services/frontend/default.conf` – small nginx config file which serves the SPA from `/usr/share/nginx/html` and proxies `/api/*` back to Python in the backend.
-- `services/frontend/site/` – the actual UI (HTML template, neon style, vanilla JavaScript logic with edit/delete buttons).
+- `services/frontend/default.conf` – small nginx config file which serves SPA from `/usr/share/nginx/html` and proxies `/api/*` back to Python in backend.
+- `services/frontend/site/` – actual UI (HTML template, neon style, vanilla JavaScript logic with edit/delete buttons).
 - `services/backend/app.py` + `start.sh` – API plus boot script that installs dependencies on the fly so Dockerfiles are not actually needed.
 - `terraform.tfvars` – this file is created for password stashing.
 
@@ -31,8 +31,8 @@ This repo as a small “local cloud” that Terraform operates. It is just Terra
    - Terraform `>= 1.5`
    - Docker Desktop or Engine running locally (I have Docker Desktop)
 2. **Then, you must Configure secrets**
-   - Copy the snippet above into `terraform.tfvars`
-   - Swap the password for any password that you want (it gets piped into Postgres + the backend)
+   - Copy snippet above into `terraform.tfvars`
+   - Swap password for any password that you want (it gets piped into Postgres + the backend)
 3. **Then, you must provision Terraform**
    ```powershell
    terraform init   # I use powershell
