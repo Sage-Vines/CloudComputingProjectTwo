@@ -9,18 +9,18 @@ from urllib.parse import urlparse
 import psycopg
 
 
-def env(name: str, default: str = "") -> str:
+def grab_env_var(name: str, default: str = "") -> str:
   """Grab env vars with a fallback so local dev isnt brittle."""
   return os.environ.get(name, default)
 
 
 # global-ish config so the rest of the file doesnt need to keep threading env vars
 DB_CONFIG = {
-    "host": env("DATABASE_HOST", "postgres-db"),
-    "dbname": env("DATABASE_NAME", "app_db"),
-    "user": env("DATABASE_USER", "app_user"),
-    "password": env("DATABASE_PASSWORD", ""),
-    "port": int(env("DATABASE_PORT", "5432")),
+    "host": grab_env_var("DATABASE_HOST", "postgres-db"),
+    "dbname": grab_env_var("DATABASE_NAME", "app_db"),
+    "user": grab_env_var("DATABASE_USER", "app_user"),
+    "password": grab_env_var("DATABASE_PASSWORD", ""),
+    "port": int(grab_env_var("DATABASE_PORT", "5432")),
 }
 
 
@@ -40,9 +40,9 @@ def init_db():
     )
 
 
-def list_notes():
+def fetch_newest_notes():
   """Return every note newest-first for the frontend list."""
-  # grab everything newest first so the UI feels lively
+  #grab everything newest first so the UI feels lively
   with psycopg.connect(**DB_CONFIG) as conn:
     with conn.cursor() as cur:
       cur.execute(
@@ -60,7 +60,7 @@ def list_notes():
       ]
 
 
-def insert_note(title: str, content: str):
+def add_note_record(title: str, content: str):
   """Insert a note and return the new row so UI can refresh without round-trips."""
   # bare bones insert with a RETURNING so we can echo data back to the UI
   with psycopg.connect(**DB_CONFIG) as conn:
@@ -79,7 +79,7 @@ def insert_note(title: str, content: str):
       }
 
 
-def update_note(note_id: int, title: str, content: str):
+def edit_note_record(note_id: int, title: str, content: str):
   """Persist edits; returns None if the row vanished."""
   with psycopg.connect(**DB_CONFIG) as conn:
     with conn.cursor() as cur:
@@ -105,7 +105,7 @@ def update_note(note_id: int, title: str, content: str):
       }
 
 
-def delete_note(note_id: int):
+def remove_note_record(note_id: int):
   """Delete a note and report whether anything actually disappeared."""
   with psycopg.connect(**DB_CONFIG) as conn:
     with conn.cursor() as cur:
@@ -115,9 +115,9 @@ def delete_note(note_id: int):
       return deleted
 
 
-def note_id_from_path(path: str) -> int | None:
+def extract_note_id(path: str) -> int | None:
   """Extract note id from routes like /api/notes/123 and ignore noise."""
-  # accepts /api/notes/123 and shrugs at bad input instead of crashing
+  #accepts /api/notes/123 and shrugs at bad input instead of crashing
   parts = path.rstrip("/").split("/")
   if len(parts) == 4 and parts[1] == "api" and parts[2] == "notes":
     try:
@@ -129,8 +129,8 @@ def note_id_from_path(path: str) -> int | None:
 
 class Handler(BaseHTTPRequestHandler):
 
-  def _json(self, payload, status=200):
-    """Consistent JSON responses with length + type headers."""
+  def send_json_response(self, payload, status=200):
+    """Consistent JSON responses with length & type headers."""
     body = json.dumps(payload).encode("utf-8")
     self.send_response(status)
     self.send_header("Content-Type", "application/json")
@@ -138,92 +138,92 @@ class Handler(BaseHTTPRequestHandler):
     self.end_headers()
     self.wfile.write(body)
 
-  def do_GET(self):  # noqa: N802 (keeping name default)
+  def do_GET(self):
     """Serve /api/notes listing."""
     path = urlparse(self.path).path
     if path == "/api/notes":
-      notes = list_notes()
-      self._json(notes)
+      notes = fetch_newest_notes()
+      self.send_json_response(notes)
     else:
-      self._json({"error": "not found"}, status=404)
+      self.send_json_response({"error": "not found"}, status=404)
 
-  def do_POST(self):  # noqa: N802
+  def do_POST(self):
     """Create a new note when the form submits."""
     path = urlparse(self.path).path
     if path != "/api/notes":
-      self._json({"error": "not found"}, status=404)
+      self.send_json_response({"error": "not found"}, status=404)
       return
 
-    payload = self._read_json()
+    payload = self.read_request_json()
     if payload is None:
       return
 
-    title, content = self._extract_body(payload)
+    title, content = self.normalize_note_payload(payload)
     if title is None:
       return
 
-    note = insert_note(title[:120], content[:2000])
-    self._json(note, status=201)
+    note = add_note_record(title[:120], content[:2000])
+    self.send_json_response(note, status=201)
 
-  def do_PUT(self):  # noqa: N802
+  def do_PUT(self):
     """Update an existing note; body matches POST payload."""
     path = urlparse(self.path).path
-    note_id = note_id_from_path(path)
+    note_id = extract_note_id(path)
     if note_id is None:
-      self._json({"error": "note id missing"}, status=400)
+      self.send_json_response({"error": "note id missing"}, status=400)
       return
 
-    payload = self._read_json()
+    payload = self.read_request_json()
     if payload is None:
       return
 
-    title, content = self._extract_body(payload)
+    title, content = self.normalize_note_payload(payload)
     if title is None:
       return
 
-    updated = update_note(note_id, title[:120], content[:2000])
+    updated = edit_note_record(note_id, title[:120], content[:2000])
     if not updated:
-      self._json({"error": "note not found"}, status=404)
+      self.send_json_response({"error": "note was not found"}, status=404)
       return
-    self._json(updated)
+    self.send_json_response(updated)
 
   def do_DELETE(self):  # noqa: N802
     """Trash a note entirely."""
     path = urlparse(self.path).path
-    note_id = note_id_from_path(path)
+    note_id = extract_note_id(path)
     if note_id is None:
-      self._json({"error": "note id missing"}, status=400)
+      self.send_json_response({"error": "note id is missing"}, status=400)
       return
 
-#ensures that note is actually deleted
-    if delete_note(note_id):
-      self._json({"status": "gone"})
+    #ensures that note is actually deleted
+    if remove_note_record(note_id):
+      self.send_json_response({"status": "gone"})
     else:
-      self._json({"error": "note not found"}, status=404)
+      self.send_json_response({"error": "note was not found"}, status=404)
 
-  def _read_json(self):
+  def read_request_json(self):
     """Best-effort JSON parser that surfaces 400s for bad payloads."""
     length = int(self.headers.get("Content-Length", 0))
     data = self.rfile.read(length) if length else b"{}"
     try:
       return json.loads(data)
     except json.JSONDecodeError:
-      self._json({"error": "bad json payload"}, status=400)
+      self.send_json_response({"error": "bad json payload"}, status=400)
       return None
 
-  def _extract_body(self, payload):
-    """Validate title/content presence and normalize whitespace."""
+  def normalize_note_payload(self, payload):
+    """Validate title/content presence & normalize whitespace."""
     title = (payload.get("title") or "").strip()
     content = (payload.get("content") or "").strip()
     if not title and not content:
-      self._json({"error": "need a title or some content"}, status=422)
+      self.send_json_response({"error": "need a title or some content"}, status=422)
       return None, None
     return title, content
 
 
 def main():
   init_db()
-  port = int(env("PORT", "5000"))
+  port = int(grab_env_var("PORT", "5000"))
   server = HTTPServer(("0.0.0.0", port), Handler)
   print(f"Backend server listening on :{port}")
   server.serve_forever()
@@ -231,4 +231,3 @@ def main():
 
 if __name__ == "__main__":
   main()
-

@@ -1,15 +1,15 @@
-//vanilla Javascript
-const notesList = document.querySelector("#notesList");
-const template = document.querySelector("#noteTemplate");
-const titleInput = document.querySelector("#title");
-const contentInput = document.querySelector("#content");
-const saveBtn = document.querySelector("#saveBtn");
-const cancelBtn = document.querySelector("#cancelBtn");
+// vanilla JavaScript because frameworks felt like overkill for a lil app
+const notesListElement = document.querySelector("#notesList");
+const noteTemplateElement = document.querySelector("#noteTemplate");
+const titleField = document.querySelector("#title");
+const contentField = document.querySelector("#content");
+const saveNoteButton = document.querySelector("#saveBtn");
+const cancelEditButton = document.querySelector("#cancelBtn");
 
 // track which note is being edited so the button toggles between save/update
-let editingId = null;
+let activeNoteId = null;
 
-async function fetchNotes() {
+async function pullNotesFromServer() {
   try {
     const res = await fetch("/api/notes");
     if (!res.ok) throw new Error("Failed to load");
@@ -22,9 +22,9 @@ async function fetchNotes() {
 
 function renderNotes(notes) {
   // not diffing for performance, just destroying and rebuilding the list
-  notesList.innerHTML = "";
+  notesListElement.innerHTML = "";
   notes.forEach((note) => {
-    const node = template.content.cloneNode(true);
+    const node = noteTemplateElement.content.cloneNode(true);
     node.querySelector(".note-title").textContent = note.title || "Untitled";
     node.querySelector(".note-body").textContent = note.content || "";
     node.querySelector(".note-date").textContent = new Date(
@@ -33,42 +33,42 @@ function renderNotes(notes) {
 
     const editBtn = node.querySelector(".note-edit");
     const deleteBtn = node.querySelector(".note-delete");
-    editBtn.addEventListener("click", () => startEdit(note));
-    deleteBtn.addEventListener("click", () => removeNote(note.id));
+    editBtn.addEventListener("click", () => beginEditingNote(note));
+    deleteBtn.addEventListener("click", () => removeNoteForever(note.id));
 
-    notesList.appendChild(node);
+    notesListElement.appendChild(node);
   });
 }
 
-function startEdit(note) {
-  //drop note data back into the form so users can tweak typos
-  editingId = note.id;
-  titleInput.value = note.title;
-  contentInput.value = note.content;
-  saveBtn.textContent = "Update note";
-  cancelBtn.hidden = false;
+function beginEditingNote(note) {
+  // drop note data back into the form so users can tweak typos
+  activeNoteId = note.id;
+  titleField.value = note.title;
+  contentField.value = note.content;
+  saveNoteButton.textContent = "Update note";
+  cancelEditButton.hidden = false;
 }
 
 function resetForm() {
-  editingId = null;
-  titleInput.value = "";
-  contentInput.value = "";
-  saveBtn.textContent = "Save note";
-  cancelBtn.hidden = true;
+  activeNoteId = null;
+  titleField.value = "";
+  contentField.value = "";
+  saveNoteButton.textContent = "Save note";
+  cancelEditButton.hidden = true;
 }
 
-async function saveNote() {
-  const title = titleInput.value.trim();
-  const content = contentInput.value.trim();
+async function upsertNoteFromForm() {
+  const title = titleField.value.trim();
+  const content = contentField.value.trim();
   if (!title && !content) {
-    alert("Need at least a title or some content, otherwise it's blank air");
+    alert("Need at least a title or some content");
     return;
   }
 
-  saveBtn.disabled = true;
+  saveNoteButton.disabled = true;
   try {
-    const endpoint = editingId ? `/api/notes/${editingId}` : "/api/notes";
-    const method = editingId ? "PUT" : "POST";
+    const endpoint = activeNoteId ? `/api/notes/${activeNoteId}` : "/api/notes";
+    const method = activeNoteId ? "PUT" : "POST";
     const res = await fetch(endpoint, {
       method,
       headers: { "Content-Type": "application/json" },
@@ -76,29 +76,29 @@ async function saveNote() {
     });
     if (!res.ok) throw new Error(await res.text());
     resetForm();
-    await fetchNotes();
+    await pullNotesFromServer();
   } catch (err) {
     alert("Oops, note failed to save. check console.");
     console.error(err);
   } finally {
-    saveBtn.disabled = false;
+    saveNoteButton.disabled = false;
   }
 }
 
-async function removeNote(id) {
-  //allows user to delete their notes as if they never existed
+async function removeNoteForever(id) {
+  // allows user to delete their notes as if they never existed
   if (!confirm("Do you actually want to delete this note?")) return;
   try {
     const res = await fetch(`/api/notes/${id}`, { method: "DELETE" });
     if (!res.ok) throw new Error(await res.text());
-    if (editingId === id) resetForm();
-    await fetchNotes();
+    if (activeNoteId === id) resetForm();
+    await pullNotesFromServer();
   } catch (err) {
     alert("Could not delete note.");
     console.error(err);
   }
 }
 
-saveBtn.addEventListener("click", saveNote);
-cancelBtn.addEventListener("click", resetForm);
-fetchNotes();
+saveNoteButton.addEventListener("click", upsertNoteFromForm);
+cancelEditButton.addEventListener("click", resetForm);
+pullNotesFromServer();

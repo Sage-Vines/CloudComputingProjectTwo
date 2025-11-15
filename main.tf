@@ -5,7 +5,7 @@ terraform {
 
   required_providers {
     docker = {
-      source = "kreuzwerker/docker"
+      source  = "kreuzwerker/docker"
       version = "~> 3.0"
     }
   }
@@ -30,7 +30,7 @@ module "network" {
   source = "./modules/network"
 
   # friendly network name & subnet so docker inspect output is predictable
-  name = var.network_name
+  name   = var.network_name
   subnet = var.network_subnet
 }
 
@@ -39,29 +39,29 @@ module "database" {
 
   #postgres spins up first so the backend has somewhere to stash notes
   container_name = "postgres-db"
-  image_name = var.database_image
-  db_name = var.database_name
-  db_user = var.database_user
-  db_password = var.database_password
-  network_name = module.network.name
-  volume_name = var.database_volume_name
-  port = var.database_port
+  image_name     = var.database_image
+  db_name        = var.database_name
+  db_user        = var.database_user
+  db_password    = var.database_password
+  network_name   = module.network.name
+  volume_name    = var.database_volume_name
+  port           = var.database_port
 }
 
 module "backend" {
   source = "./modules/backend"
 
   #backend uses the stock python image; start.sh installs psycopg and runs app.py
-  image_name = var.backend_image
+  image_name     = var.backend_image
   container_name = "backend-service"
-  internal_port = local.backend_internal_port
-  code_path = local.backend_code_path
-  command = ["/bin/sh", "/app/start.sh"]
+  internal_port  = local.backend_internal_port
+  code_path      = local.backend_code_path
+  command        = ["/bin/sh", "/app/start.sh"]
   env = {
-    DATABASE_HOST = module.database.container_name
-    DATABASE_USER = var.database_user
+    DATABASE_HOST     = module.database.container_name
+    DATABASE_USER     = var.database_user
     DATABASE_PASSWORD = var.database_password
-    DATABASE_NAME = var.database_name
+    DATABASE_NAME     = var.database_name
   }
   network_name = module.network.name
 
@@ -72,18 +72,18 @@ module "frontend" {
   source = "./modules/frontend"
 
   #frontend is just nginx serving static files and proxying /api/* calls to the backend container
-  image_name = var.frontend_image
+  image_name     = var.frontend_image
   container_name = "frontend"
-  host_port = var.frontend_host_port
-  network_name = module.network.name
-  config_path = local.frontend_config_path
-  site_path = local.frontend_site_path
+  host_port      = var.frontend_host_port
+  network_name   = module.network.name
+  config_path    = local.frontend_config_path
+  site_path      = local.frontend_site_path
 
   depends_on = [module.backend]
 }
 
 output "frontend_url" {
-  description = "Local URL for the frontend application"
-  value = "http://localhost:${var.frontend_host_port}"
+  description = "Local URL for frontend app"
+  value       = "http://localhost:${var.frontend_host_port}"
 }
 
