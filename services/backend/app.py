@@ -25,8 +25,9 @@ DB_CONFIG = {
 
 
 def init_db():
-  """Create notes table on boot so API never crashes on missing schema."""
+  """creates the notes table if it doesnt exist"""
   # create notes table if someone destroyed it, keeps demo resilient
+  #print("init db called")  #debug
   with psycopg.connect(**DB_CONFIG) as conn:
     conn.execute("""
         CREATE TABLE IF NOT EXISTS notes (
@@ -53,19 +54,23 @@ def fetch_newest_notes():
 def add_note_record(title: str, content: str):
   """Insert note & eturn new row so UI can refresh w/out roundtrips"""
   #bare bones insert w/ RETURNING so we echo data back
+  #try:
   with psycopg.connect(**DB_CONFIG) as conn:
     with conn.cursor() as cur:
       cur.execute("INSERT INTO notes (title, content) VALUES (%s, %s) RETURNING id, created_at;", (title, content))
       row = cur.fetchone()
       conn.commit()
       return {"id": row[0], "title": title, "content": content, "created_at": row[1].isoformat()}
+  #except Exception as e:
+  #  print(f"error adding note: {e}")  #left this here for debugging
 
 
 def edit_note_record(note_id: int, title: str, content: str):
-  """Persist edits, returns None if row vanished"""
+  #updates a note, returns None if it doesnt exist
   #TODO: maybe add validation here later?
   with psycopg.connect(**DB_CONFIG) as conn:
     with conn.cursor() as cur:
+      #print(f"editing note {note_id}")  #debug line
       cur.execute("""
           UPDATE notes
              SET title = %s, content = %s
@@ -90,9 +95,10 @@ def remove_note_record(note_id: int):
 
 
 def extract_note_id(path: str) -> int | None:
-  """Extract note id from routes like api notes i123 & ignore noise"""
+  #extract note id from path like /api/notes/123
   #accepts /api/notes/123 and shrugs at bad input instead of crashing
   parts = path.rstrip("/").split("/")
+  #print(f"extracting id from {parts}")  #was debugging path parsing
   if len(parts) == 4 and parts[1] == "api" and parts[2] == "notes":
     try:
       return int(parts[3])
@@ -116,8 +122,12 @@ class Handler(BaseHTTPRequestHandler):
     #just return all notes, simple enough
     path = urlparse(self.path).path
     if path == "/api/notes":
-      notes = fetch_newest_notes()
-      self.send_json_response(notes)
+      try:
+        notes = fetch_newest_notes()
+        self.send_json_response(notes)
+      except Exception as e:
+        print(f"error fetching notes: {e}")  #keep this for now
+        self.send_json_response({"error": "server error"}, status=500)
     else:
       self.send_json_response({"error": "not found"}, status=404)
 
@@ -135,7 +145,9 @@ class Handler(BaseHTTPRequestHandler):
     title, content = self.normalize_note_payload(payload)
     if title is None: return
 
+    #might need to catch errors here but seems to work for now
     note = add_note_record(title[:120], content[:2000])  # cap title/content length
+    #print(f"created note: {note['id']}")  #debug
     self.send_json_response(note, status=201)
 
   def do_PUT(self):
@@ -178,9 +190,11 @@ class Handler(BaseHTTPRequestHandler):
     data = self.rfile.read(length) if length else b"{}"
     try:
       return json.loads(data)
-    except json.JSONDecodeError:
+    except json.JSONDecodeError as e:
+      #print(f"json error: {e}")  #debug
       self.send_json_response({"error": "bad json payload"}, status=400)
       return None
+    #should probably catch other exceptions too but whatever
 
   def normalize_note_payload(self, payload):
     #extract & validate title/content, trim whitespace
@@ -195,8 +209,10 @@ class Handler(BaseHTTPRequestHandler):
 def main():
   init_db()  #ensure table exists before starting
   port = int(grab_env_var("PORT", "5000"))
+  #port = 5001  #temp test port
   server = HTTPServer(("0.0.0.0", port), Handler)
   print(f"Backend server listening on :{port}")
+  #print("starting server...")  #debug
   server.serve_forever()
 
 

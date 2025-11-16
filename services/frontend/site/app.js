@@ -14,15 +14,18 @@ async function pullNotesFromServer() {
     const res = await fetch("/api/notes");
     if (!res.ok) throw new Error("Failed to load");
     const notes = await res.json();
+    //console.log("fetched notes:", notes.length);  //debug
     renderNotes(notes);
   } catch (err) {
     console.error("could not fetch notes", err);
+    //should probably show user an error but whatever
   }
 }
 
 function renderNotes(notes) {
   //not diffing for performance, just destroying and rebuilding the list
   notesListElement.innerHTML = "";
+  //if (notes.length === 0) console.log("no notes to render");  //debug
   notes.forEach((note) => {
     const node = noteTemplateElement.content.cloneNode(true);
     node.querySelector(".note-title").textContent = note.title || "Untitled";
@@ -39,6 +42,7 @@ function renderNotes(notes) {
 function beginEditingNote(note) {
   //drop note data back into form so users can tweak typos
   activeNoteId = note.id;
+  //console.log("editing note:", note.id);  //was debugging
   titleField.value = note.title;
   contentField.value = note.content;
   saveNoteButton.textContent = "Update note";
@@ -64,17 +68,22 @@ async function upsertNoteFromForm() {
   try {
     const endpoint = activeNoteId ? `/api/notes/${activeNoteId}` : "/api/notes";
     const method = activeNoteId ? "PUT" : "POST";
+    //console.log(`saving note via ${method} to ${endpoint}`);  //debug
     const res = await fetch(endpoint, {
       method,
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ title, content }),
     });
-    if (!res.ok) throw new Error(await res.text());
+    if (!res.ok) {
+      const errorText = await res.text();
+      throw new Error(errorText);
+    }
     resetForm();
     await pullNotesFromServer();
   } catch (err) {
+    //sometimes the error is helpful, sometimes not
     alert("Oops, note failed to save. check console.");
-    console.error(err);
+    console.error("save error:", err);
   } finally {
     saveNoteButton.disabled = false;
   }
@@ -83,17 +92,19 @@ async function upsertNoteFromForm() {
 async function removeNoteForever(id) {
   //allows user to delete notes as if they never existed
   if (!confirm("Do you actually want to delete this note?")) return;
-  try {
-    const res = await fetch(`/api/notes/${id}`, { method: "DELETE" });
-    if (!res.ok) throw new Error(await res.text());
-    if (activeNoteId === id) resetForm();
-    await pullNotesFromServer();
-  } catch (err) {
+  //console.log("deleting note:", id);  //debug
+  const res = await fetch(`/api/notes/${id}`, { method: "DELETE" });
+  if (!res.ok) {
     alert("Could not delete note.");
-    console.error(err);
+    console.error("delete failed:", await res.text());
+    return;
   }
+  if (activeNoteId === id) resetForm();
+  await pullNotesFromServer();
+  //removed try/catch here, see if it works without it
 }
 
 saveNoteButton.addEventListener("click", upsertNoteFromForm);
 cancelEditButton.addEventListener("click", resetForm);
-pullNotesFromServer();
+pullNotesFromServer();  //load notes on page load
+//pullNotesFromServer();  //duplicate, was testing something
