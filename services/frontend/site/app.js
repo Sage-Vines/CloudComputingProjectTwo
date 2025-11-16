@@ -1,4 +1,4 @@
-// vanilla JavaScript because frameworks felt like overkill for a lil app
+//vanilla JavaScript because frameworks felt like overkill for a lil app
 const notesListElement = document.querySelector("#notesList");
 const noteTemplateElement = document.querySelector("#noteTemplate");
 const titleField = document.querySelector("#title");
@@ -6,7 +6,7 @@ const contentField = document.querySelector("#content");
 const saveNoteButton = document.querySelector("#saveBtn");
 const cancelEditButton = document.querySelector("#cancelBtn");
 
-// track which note is being edited so the button toggles between save/update
+//track which note is being edited so button toggles between save/update
 let activeNoteId = null;
 
 async function pullNotesFromServer() {
@@ -21,27 +21,23 @@ async function pullNotesFromServer() {
 }
 
 function renderNotes(notes) {
-  // not diffing for performance, just destroying and rebuilding the list
+  //not diffing for performance, just destroying and rebuilding the list
   notesListElement.innerHTML = "";
   notes.forEach((note) => {
     const node = noteTemplateElement.content.cloneNode(true);
     node.querySelector(".note-title").textContent = note.title || "Untitled";
     node.querySelector(".note-body").textContent = note.content || "";
-    node.querySelector(".note-date").textContent = new Date(
-        note.created_at
-    ).toLocaleString();
-
+    node.querySelector(".note-date").textContent = new Date(note.created_at).toLocaleString();
     const editBtn = node.querySelector(".note-edit");
     const deleteBtn = node.querySelector(".note-delete");
     editBtn.addEventListener("click", () => beginEditingNote(note));
     deleteBtn.addEventListener("click", () => removeNoteForever(note.id));
-
     notesListElement.appendChild(node);
   });
 }
 
 function beginEditingNote(note) {
-  // drop note data back into the form so users can tweak typos
+  //drop note data back into form so users can tweak typos
   activeNoteId = note.id;
   titleField.value = note.title;
   contentField.value = note.content;
@@ -64,7 +60,6 @@ async function upsertNoteFromForm() {
     alert("Need at least a title or some content");
     return;
   }
-
   saveNoteButton.disabled = true;
   try {
     const endpoint = activeNoteId ? `/api/notes/${activeNoteId}` : "/api/notes";
@@ -86,7 +81,7 @@ async function upsertNoteFromForm() {
 }
 
 async function removeNoteForever(id) {
-  // allows user to delete their notes as if they never existed
+  //allows user to delete notes as if they never existed
   if (!confirm("Do you actually want to delete this note?")) return;
   try {
     const res = await fetch(`/api/notes/${id}`, { method: "DELETE" });

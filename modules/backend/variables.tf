@@ -1,12 +1,12 @@
-# all backend variables live here, poke them carefully
+#all backend variables live here, poke them carefully
 variable "backend_image_name" {
   description = "Name for backend base image"
   type = string
 }
 
-variable "backend_container_name"{
+variable "backend_container_name" {
   description = "Backend container name"
-  type= string
+  type = string
 }
 
 variable "backend_service_port" {
@@ -19,15 +19,15 @@ variable "backend_source_mount" {
   type = string
 }
 
-variable "backend_start_command"{
+variable "backend_start_command" {
   description = "Command array used to start backend service"
   type = list(string)
   default = ["/bin/sh", "/app/start.sh"]
 }
 
-variable "backend_environment_values"{
+variable "backend_environment_values" {
   description = "Environment variables passed to container"
-  type= map(string)
+  type = map(string)
   default = {}
 }
 

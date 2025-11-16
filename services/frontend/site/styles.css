@@ -1,4 +1,4 @@
-/* neon styling for notes app */
+/*neon styling for notes app*/
 :root {
   color-scheme: light dark;
   font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
@@ -7,7 +7,7 @@
 
 body {
   margin: 0;
-  background: #0f172a;
+  background: #0f172a;  /*dark slate background*/
   color: #e2e8f0;
 }
 
@@ -28,7 +28,7 @@ header h1 {
 
 .compose {
   margin-top: 2rem;
-  background: rgba(15, 23, 42, 0.7);
+  background: rgba(15, 23, 42, 0.7);  /*semi-transparent dark bg*/
   border: 1px solid rgba(148, 163, 184, 0.2);
   border-radius: 16px;
   padding: 1.5rem;
@@ -58,7 +58,7 @@ textarea {
 
 button {
   align-self: flex-start;
-  background: linear-gradient(130deg, #6366f1, #8b5cf6);
+  background: linear-gradient(130deg, #6366f1, #8b5cf6);  /*purple gradient*/
   border: none;
   border-radius: 999px;
   color: white;
@@ -100,7 +100,7 @@ ul {
   border: 1px solid rgba(148, 163, 184, 0.2);
   border-radius: 14px;
   padding: 1rem 1.25rem;
-  background: rgba(15, 23, 42, 0.75);
+  background: rgba(15, 23, 42, 0.75);  /*slightly opaque dark bg*/
   display: flex;
   justify-content: space-between;
   gap: 1.25rem;
@@ -141,10 +141,11 @@ ul {
 }
 
 .note-delete {
-  border-color: rgba(248, 113, 113, 0.5);
+  border-color: rgba(248, 113, 113, 0.5);  /*red tint for delete button*/
   color: #fecaca;
 }
 
+/*mobile responsive, stack notes vertically on small screens*/
 @media (max-width: 640px) {
   .note {
     flex-direction: column;

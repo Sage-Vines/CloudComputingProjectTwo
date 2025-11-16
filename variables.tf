@@ -1,38 +1,38 @@
-# Kinda messy list of variables you can tweak, secrets go in tfvars
-#this whole file is basically control panel for local cloud
+#Kinda messy list of variables you can tweak, secrets go in tfvars
+# this whole file is basically control panel for local cloud
 variable "network_name" {
   description = "Custom Docker network"
   type = string
-  default= "local-cloud"
+  default = "local-cloud"
 }
 
 variable "network_subnet" {
   description = "Private subnet used by Docker network"
-  type= string
+  type = string
   default = "172.28.0.0/16"
 }
 
 variable "frontend_host_port" {
   description = "Host port exposed for frontend"
   type = number
-  default= 8080
+  default = 8080
 }
 
 variable "backend_image" {
   description = "Base image used for backend microservice"
-  type= string
+  type = string
   default = "python:3.11-slim"
 }
 
 variable "frontend_image" {
-  description ="Image used for nginx frontend"
+  description = "Image used for nginx frontend"
   type = string
-  default ="nginx:alpine"
+  default = "nginx:alpine"
 }
 
 variable "database_image" {
   description = "Docker image for Postgres"
-  type= string
+  type = string
   default = "postgres:15-alpine"
 }
 
@@ -43,20 +43,20 @@ variable "database_name" {
 }
 
 variable "database_user" {
-  description ="Database user"
+  description = "Database user"
   type = string
-  default= "app_user"
+  default = "app_user"
 }
 
 variable "database_password" {
   description = "Database password"
   type = string
-  sensitive = true
+  sensitive = true  #dont print this in logs
 }
 
 variable "database_volume_name" {
   description = "Name for persistent Postgres volume"
-  type= string
+  type = string
   default = "postgres-data"
 }
 

@@ -10,7 +10,7 @@ import psycopg
 
 
 def grab_env_var(name: str, default: str = "") -> str:
-  """Grab env vars w/ fallback so local dev isnt brittle."""
+  #just a helper so we dont repeat os.environ.get everywhere
   return os.environ.get(name, default)
 
 
@@ -28,89 +28,63 @@ def init_db():
   """Create notes table on boot so API never crashes on missing schema."""
   # create notes table if someone destroyed it, keeps demo resilient
   with psycopg.connect(**DB_CONFIG) as conn:
-    conn.execute(
-        """
+    conn.execute("""
         CREATE TABLE IF NOT EXISTS notes (
           id SERIAL PRIMARY KEY,
           title TEXT NOT NULL DEFAULT '',
           content TEXT NOT NULL DEFAULT '',
           created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
         );
-        """
-    )
+    """)
 
 
 def fetch_newest_notes():
-  """Return every note newest-first for frontend list"""
-  #grab everything newest first so UI feels lively
+  #grabs everything newest-first so the UI feels responsive
   with psycopg.connect(**DB_CONFIG) as conn:
     with conn.cursor() as cur:
-      cur.execute(
-          "SELECT id, title, content, created_at FROM notes ORDER BY created_at DESC;"
-      )
+      cur.execute("SELECT id, title, content, created_at FROM notes ORDER BY created_at DESC;")
       rows = cur.fetchall()
       return [
-          {
-              "id": row[0],
-              "title": row[1],
-              "content": row[2],
-              "created_at": row[3].isoformat(),
-          }
+          {"id": row[0], "title": row[1], "content": row[2], "created_at": row[3].isoformat()}
           for row in rows
       ]
 
 
 def add_note_record(title: str, content: str):
   """Insert note & eturn new row so UI can refresh w/out roundtrips"""
-  # bare bones insert with a RETURNING so we can echo data back to UI
+  #bare bones insert w/ RETURNING so we echo data back
   with psycopg.connect(**DB_CONFIG) as conn:
     with conn.cursor() as cur:
-      cur.execute(
-          "INSERT INTO notes (title, content) VALUES (%s, %s) RETURNING id, created_at;",
-          (title, content),
-      )
+      cur.execute("INSERT INTO notes (title, content) VALUES (%s, %s) RETURNING id, created_at;", (title, content))
       row = cur.fetchone()
       conn.commit()
-      return {
-          "id": row[0],
-          "title": title,
-          "content": content,
-          "created_at": row[1].isoformat(),
-      }
+      return {"id": row[0], "title": title, "content": content, "created_at": row[1].isoformat()}
 
 
 def edit_note_record(note_id: int, title: str, content: str):
   """Persist edits, returns None if row vanished"""
+  #TODO: maybe add validation here later?
   with psycopg.connect(**DB_CONFIG) as conn:
     with conn.cursor() as cur:
-      cur.execute(
-          """
+      cur.execute("""
           UPDATE notes
-             SET title = %s,
-                 content = %s
+             SET title = %s, content = %s
            WHERE id = %s
        RETURNING id, created_at;
-          """,
-          (title, content, note_id),
-      )
+      """, (title, content, note_id))
       row = cur.fetchone()
       if not row:
         return None
       conn.commit()
-      return {
-          "id": row[0],
-          "title": title,
-          "content": content,
-          "created_at": row[1].isoformat(),
-      }
+      return {"id": row[0], "title": title, "content": content, "created_at": row[1].isoformat()}
 
 
 def remove_note_record(note_id: int):
-  """Delete note & report whether anything actually disappeared"""
+  #simple delete, just checks if anything got removed
   with psycopg.connect(**DB_CONFIG) as conn:
     with conn.cursor() as cur:
       cur.execute("DELETE FROM notes WHERE id = %s;", (note_id,))
-      deleted = cur.rowcount > 0
+      deleted = cur.rowcount > 0  # did we actually delete something?
       conn.commit()
       return deleted
 
@@ -130,7 +104,7 @@ def extract_note_id(path: str) -> int | None:
 class Handler(BaseHTTPRequestHandler):
 
   def send_json_response(self, payload, status=200):
-    """Consistent JSON responses w/ length & type headers"""
+    #helper to send json with proper headers, reused everywhere
     body = json.dumps(payload).encode("utf-8")
     self.send_response(status)
     self.send_header("Content-Type", "application/json")
@@ -139,7 +113,7 @@ class Handler(BaseHTTPRequestHandler):
     self.wfile.write(body)
 
   def do_GET(self):
-    """Serve api notes listing"""
+    #just return all notes, simple enough
     path = urlparse(self.path).path
     if path == "/api/notes":
       notes = fetch_newest_notes()
@@ -159,14 +133,13 @@ class Handler(BaseHTTPRequestHandler):
       return
 
     title, content = self.normalize_note_payload(payload)
-    if title is None:
-      return
+    if title is None: return
 
-    note = add_note_record(title[:120], content[:2000])
+    note = add_note_record(title[:120], content[:2000])  # cap title/content length
     self.send_json_response(note, status=201)
 
   def do_PUT(self):
-    """Update an existing note; body matches POST payload"""
+    #update existing note, basically same as POST but with id in path
     path = urlparse(self.path).path
     note_id = extract_note_id(path)
     if note_id is None:
@@ -174,12 +147,10 @@ class Handler(BaseHTTPRequestHandler):
       return
 
     payload = self.read_request_json()
-    if payload is None:
-      return
+    if payload is None: return
 
     title, content = self.normalize_note_payload(payload)
-    if title is None:
-      return
+    if title is None: return
 
     updated = edit_note_record(note_id, title[:120], content[:2000])
     if not updated:
@@ -202,7 +173,7 @@ class Handler(BaseHTTPRequestHandler):
       self.send_json_response({"error": "note was not found"}, status=404)
 
   def read_request_json(self):
-    """JSON parser that surfaces 400s for bad payloads"""
+    #best-effort JSON parsing, sends 400 if it fails
     length = int(self.headers.get("Content-Length", 0))
     data = self.rfile.read(length) if length else b"{}"
     try:
@@ -212,7 +183,7 @@ class Handler(BaseHTTPRequestHandler):
       return None
 
   def normalize_note_payload(self, payload):
-    """Validates title & content presence & normalize whitespace"""
+    #extract & validate title/content, trim whitespace
     title = (payload.get("title") or "").strip()
     content = (payload.get("content") or "").strip()
     if not title and not content:
@@ -222,7 +193,7 @@ class Handler(BaseHTTPRequestHandler):
 
 
 def main():
-  init_db()
+  init_db()  #ensure table exists before starting
   port = int(grab_env_var("PORT", "5000"))
   server = HTTPServer(("0.0.0.0", port), Handler)
   print(f"Backend server listening on :{port}")
