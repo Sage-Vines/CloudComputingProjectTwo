@@ -1,9 +1,9 @@
 # Local Cloud With Terraform & Docker
 
-This repo as a small “local cloud” that Terraform operates. It is just Terraform, Docker provider, and config files that turn into a note-taking app with a modern UI, a Python API, and a Postgres database.
+This repo as a small “local cloud” that Terraform operates. It is just Terraform, Docker provider, and config files that turn into a note-taking app w/ a modern UI, a Python API, and a Postgres database.
 
-- **Frontend (Nginx & static SPA)** - services/frontend/site holds the HTML/CSS/JS bundle. Terraform mounts that folder along with default.conf into the stock nginx:alpine image. The app lets you create, edit, and delete notes.
-- **Backend (Python)** - services/backend/app.py is a HTTP server which is free from frameworks. Terraform bind-mounts folder inside python:3.11-slim, the start.sh script installs psycopg on boot, and the API exposes /api/notes for GET & POST & PUT & DELETE with auto table creation.
+- **Frontend (Nginx & static SPA)** - services/frontend/site holds the HTML/CSS/JS bundle. Terraform mounts that folder along w/ default.conf into the stock nginx:alpine image. The app lets you create, edit, and delete notes.
+- **Backend (Python)** - services/backend/app.py is a HTTP server which is free from frameworks. Terraform bind-mounts folder inside python:3.11-slim, the start.sh script installs psycopg on boot, and the API exposes /api/notes for GET & POST & PUT & DELETE w/ auto table creation.
 - **Postgres Database** - real postgres:15-alpine, credentials arrive via variables, and the module attaches a named Docker volume so data sticks around between runs.
 - **Custom Docker network** - local-cloud keeps every container on the same subnet so service discovery is predictable.
 
@@ -21,7 +21,7 @@ This repo as a small “local cloud” that Terraform operates. It is just Terra
 - `main.tf`, `variables.tf`, `outputs.tf`  -what orchesrates everything
 - `modules/*` - one directory per component, each declaring its own provider requirements, inputs, and outputs
 - `services/frontend/default.conf` - small nginx config file which serves SPA from `/usr/share/nginx/html` and proxies `/api/*` back to Python in backend
-- `services/frontend/site/` - actual UI (HTML template, neon style, vanilla JavaScript logic with edit/delete buttons)
+- `services/frontend/site/` - actual UI (HTML template, neon style, vanilla JavaScript logic w/ edit/delete buttons)
 - `services/backend/app.py` & `start.sh` - API plus boot script that installs dependencies on the fly so Dockerfiles are not actually needed
 - `terraform.tfvars` - this file is created for password stashing
 
@@ -46,7 +46,7 @@ This repo as a small “local cloud” that Terraform operates. It is just Terra
    - docker volume ls will list postgres-data, proving the enhancement is alive
 5. **If you want to edit the code**
    - Change frontend files under services/frontend/site or backend code in services/backend
-   - Re-run terraform apply and the containers restart with the new code because we bind-mount those folders
+   - Re-run terraform apply and the containers restart w/ new code because we bind-mount those folders
 
 ## If you want to clean up the code
 
