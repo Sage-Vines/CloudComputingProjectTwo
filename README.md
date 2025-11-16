@@ -10,11 +10,11 @@ This repo spins up a tiny static site on a local kind cluster (https://kind.sigs
 
 ## Included in this project
 
-- `main.tf` – wires Terraform to Kubernetes, renders the template, deploys it, exposes it
-- `variables.tf` – all input variables for website
-- `terraform.tfvars` – default values
-- `templates/index.html.tpl` – the UI w/ gradient background, highlight pills, CTA
-- `outputs.tf` – handy copy/paste snippets (namespace & port-forward command)
+- `main.tf` - wires Terraform to Kubernetes, renders the template, deploys it, exposes it
+- `variables.tf` - all input variables for website
+- `terraform.tfvars` - default values
+- `templates/index.html.tpl` - the UI w/ gradient background, highlight pills, CTA
+- `outputs.tf` - handy copy/paste snippets (namespace & port-forward command)
 
 ## How to run it
 
@@ -35,16 +35,16 @@ This repo spins up a tiny static site on a local kind cluster (https://kind.sigs
 
 ## Enhancements
 
-- **ConfigMap content** – Terraform fills in templates/index.html.tpl
+- **ConfigMap content** - Terraform fills in templates/index.html.tpl
   using whatever values chosen for hero_card_title, hero_card_message, and the list of blurbs. Updating the varfiables will update the pages automatically.
 
-- **Accent & highlight chips** – hero_accent_hex and bragging_highlights
+- **Accent & highlight chips** - hero_accent_hex and bragging_highlights
   control the pills without touching CSS.
 
-- **Gradient aura & glow** – cozy_background_start, cozy_background_end,
+- **Gradient aura & glow** - cozy_background_start, cozy_background_end,
   and glowy_shadow_blur_size helps to design and fine-tine the background mood
 
-- **CTA button** – handy_button_label_text & handy_button_url_link drop a
+- **CTA button** - handy_button_label_text & handy_button_url_link drop a
   nice call to action button for pointing towards documentation or other things.
 
 ## Getting rid of Everything
