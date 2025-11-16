@@ -38,10 +38,10 @@ This repo spins up a tiny static site on a local kind cluster (https://kind.sigs
 - **ConfigMap content** - Terraform fills in templates/index.html.tpl
   using whatever values chosen for hero_card_title, hero_card_message, and the list of blurbs. Updating the varfiables will update the pages automaticaly.
 
-- **Accent & highlight chips** - hero_accent_hex and bragging_highlights
+- **Accent & highlight chips** - accent_hex and highlights
   control the pills without touching CSS.
 
-- **Gradient aura & glow** - cozy_background_start, cozy_background_end,
+- **Gradient aura & glow** - background_start, background_end,
   and glowy_shadow_blur_size helps to design and fine tune the background mood
 
 - **CTA button** - handy_button_label_text & handy_button_url_link drop a
