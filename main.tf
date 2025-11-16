@@ -24,7 +24,7 @@ locals {
     "app.kubernetes.io/managed-by" = "terraform"
   }
 }
-#seriously, consistent labels make kubectl get pods way nicer
+#consistent labels make kubectl get pods way nicer
 
 #isolates application resources from default namespace
 resource "kubernetes_namespace" "app" {
