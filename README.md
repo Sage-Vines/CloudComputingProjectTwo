@@ -4,7 +4,7 @@ This repo as a small “local cloud” that Terraform operates. It is just Terra
 
 - **Frontend (Nginx & static SPA)** - services/frontend/site holds the HTML/CSS/JS bundle. Terraform mounts that folder along with default.conf into the stock nginx:alpine image. The app lets you create, edit, and delete notes.
 - **Backend (Python)** - services/backend/app.py is a HTTP server which is free from frameworks. Terraform bind-mounts folder inside python:3.11-slim, the start.sh script installs psycopg on boot, and the API exposes /api/notes for GET & POST & PUT & DELETE with auto table creation.
-- **Postgres Database** – real postgres:15-alpine, credentials arrive via variables, and the module attaches a named Docker volume so data sticks around between runs.
+- **Postgres Database** - real postgres:15-alpine, credentials arrive via variables, and the module attaches a named Docker volume so data sticks around between runs.
 - **Custom Docker network** - local-cloud keeps every container on the same subnet so service discovery is predictable.
 
 ## Requirements Satisfied
