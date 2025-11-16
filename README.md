@@ -4,7 +4,7 @@ This repo spins up a tiny static site on a local kind cluster (https://kind.sigs
 
 ## What is needed
 
-- Terraform ≥ 1.5
+- Terraform >= 1.5
 - kind cluster already running (the sample context is kind-cloudcomp-cluster)
 - kubectl pointed at that cluster so Terraform’s Kubernetes provider can reach it
 
