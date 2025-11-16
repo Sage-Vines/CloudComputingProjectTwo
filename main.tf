@@ -10,36 +10,36 @@ terraform {
   }
 }
 
-#this provider basically grabs our kubeconfig & context so terraform knows who to talk to
+#specifies kubeconfig path and context for cluster authenticatio
 provider "kubernetes" {
-  config_path = var.pals_kubeconfig_path
+  config_path = var.kubeconfig_path
   config_context = var.chatty_kube_context
 }
 
 #labels that keep everything findable later
 locals {
   app_labels = {
-    "app.kubernetes.io/name" = var.chill_app_name
+    "app.kubernetes.io/name" = var.app_name
     "app.kubernetes.io/component" = "web"
     "app.kubernetes.io/managed-by" = "terraform"
   }
 }
 #seriously, consistent labels make kubectl get pods way nicer
 
-#create the namespace home so all the other objects dont crash into default
+#isolates application resources from default namespace
 resource "kubernetes_namespace" "app" {
   metadata {
-    name = var.comfy_namespace_name
+    name = var.namespace
     labels = {
       environment = var.vibe_environment_tag
     }
   }
 }
 
-#render html template & stash it in configmap so nginx can just mount files
+#ConfigMap renders HTML template and stores it for nginx volum mount
 resource "kubernetes_config_map" "static_site" {
   metadata {
-    name = "${var.chill_app_name}-content"
+    name = "${var.app_name}-content"
     namespace = kubernetes_namespace.app.metadata[0].name
     labels = local.app_labels
   }
@@ -61,17 +61,17 @@ resource "kubernetes_config_map" "static_site" {
 }
 #any updates to those vars rerender html automatically on apply
 
-#deployment keeps pods alive & injects configmap as static content
+#Deployment manages pod replicas and mounts ConfigMap as volume
 resource "kubernetes_deployment" "app" {
   metadata {
-    name= "${var.chill_app_name}-deployment"
+    name= "${var.app_name}-deployment"
     namespace = kubernetes_namespace.app.metadata[0].name
     labels = local.app_labels
   }
 
   spec {
     #setting replica count here keeps kubernetes honest w/ how many pods we expect
-    replicas = var.starter_pod_count
+    replicas = var.replicas
 
     selector {
       match_labels = local.app_labels
@@ -85,8 +85,8 @@ resource "kubernetes_deployment" "app" {
       spec {
         container {
           #nginx hosts rendered html & these envs make debugging nicer
-          name= var.chill_app_name
-          image = var.web_server_image_name
+          name= var.app_name
+          image = var.container_image
 
           port {
             name= "http"
@@ -111,7 +111,7 @@ resource "kubernetes_deployment" "app" {
           }
 
           liveness_probe {
-            #tiny health check so kind restarts pod if nginx is not working correctly
+            #HTTP GET probe: checks container health, triggers restart on failure
             http_get {
               path = "/"
               port = "http"
@@ -122,6 +122,7 @@ resource "kubernetes_deployment" "app" {
           #readiness stays separate so port-forward waits for html to actually serve
 
           readiness_probe {
+            #Readiness probe: determines when pod can receive traffic
             http_get {
               path = "/"
               port = "http"
@@ -149,10 +150,10 @@ resource "kubernetes_deployment" "app" {
   }
 }
 
-#service exposes pods via stable cluster ip so we can portforward easily
+#Service exposes deployment pods via ClusterIP for internal acces
 resource "kubernetes_service" "app" {
   metadata {
-    name= "${var.chill_app_name}-service"
+    name= "${var.app_name}-service"
     namespace = kubernetes_namespace.app.metadata[0].name
     labels= local.app_labels
   }

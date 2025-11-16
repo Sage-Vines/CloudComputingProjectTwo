@@ -1,7 +1,7 @@
 #This file is variables dashboard
 #keeping kube access details up top so no one hunts for them later
 
-variable "pals_kubeconfig_path" {
+variable "kubeconfig_path" {
   description = "absolute path to kubeconfig file for kind cluster, otherwise terraform just shrugs."
   type = string
   default = "~/.kube/config"
@@ -13,33 +13,33 @@ variable "chatty_kube_context" {
   default = "kind-cloudcomp-cluster"
 }
 
-variable "comfy_namespace_name" {
+variable "namespace" {
   description = "namespace where all goodies live"
   type = string
   default= "cloudcomp-app"
 }
 #handy to rename if you want different namespaces
 
-variable "chill_app_name" {
+variable "app_name" {
   description = "base name that becomes part of labels, services, deployments etc."
   type = string
   default = "static-site"
 }
 
 variable "vibe_environment_tag" {
-  description = "quick little environment tag so dashboards look more organizedish."
+  description = "quick little environment tag so dashboards look more organizd."
   type = string
   default = "dev"
 }
 
-variable "starter_pod_count" {
+variable "replicas" {
   description = "how many pods we kick off with before we think about autoscaling."
   type = number
   default = 2
 }
 #kind nodes appreciate it when we dont start with too many replicas
 
-variable "web_server_image_name" {
+variable "container_image" {
   description = "nginx image that ends up serving our html."
   type = string
   default = "nginx:1.27-alpine"
@@ -81,7 +81,7 @@ variable "cozy_background_start" {
 }
 
 variable "cozy_background_end" {
-  description = "second gradient color stop so background doesnt look flat"
+  description = "second gradient color stop so background dosnt look flat"
   type = string
   default = "#e0f2fe"
 }

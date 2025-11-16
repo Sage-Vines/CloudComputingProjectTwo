@@ -18,7 +18,7 @@ This repo spins up a tiny static site on a local kind cluster (https://kind.sigs
 
 ## How to run it
 
-1. Open terraform.tfvars & set values like pals_kubeconfig_path, chill_app_name, & hero_card_title
+1. Open terraform.tfvars & set values like kubeconfig_path, app_name, & hero_card_title
 2. Run:
    ```powershell
    terraform init
@@ -36,13 +36,13 @@ This repo spins up a tiny static site on a local kind cluster (https://kind.sigs
 ## Enhancements
 
 - **ConfigMap content** - Terraform fills in templates/index.html.tpl
-  using whatever values chosen for hero_card_title, hero_card_message, and the list of blurbs. Updating the varfiables will update the pages automatically.
+  using whatever values chosen for hero_card_title, hero_card_message, and the list of blurbs. Updating the varfiables will update the pages automaticaly.
 
 - **Accent & highlight chips** - hero_accent_hex and bragging_highlights
   control the pills without touching CSS.
 
 - **Gradient aura & glow** - cozy_background_start, cozy_background_end,
-  and glowy_shadow_blur_size helps to design and fine-tine the background mood
+  and glowy_shadow_blur_size helps to design and fine tune the background mood
 
 - **CTA button** - handy_button_label_text & handy_button_url_link drop a
   nice call to action button for pointing towards documentation or other things.
