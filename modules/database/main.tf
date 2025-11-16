@@ -1,6 +1,7 @@
 #sets up postgres plus a little volume so data doesnt vanish each restart
 resource "docker_volume" "data" {
   name = var.persistent_volume_name
+  #driver = "local"  #default, could specify explicitly
 }
 
 resource "docker_image" "this" {
@@ -27,6 +28,7 @@ resource "docker_container" "this" {
   }
   ports {
     internal = var.internal_database_port
+    #external = 5432  #exposed for debugging but probably not needed in prod
   }
 }
 

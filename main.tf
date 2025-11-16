@@ -18,12 +18,14 @@ locals {
   #locals keep repetitive paths + ports out of the module blocks because future me forgets them
   # this port value is the single source of truth for frontend proxying
   backend_internal_port = 5000
+  #backend_internal_port = 5001  #test port, might use later
   #bind mount path for python backend so editing files doesnt need image rebuilds
   backend_code_path = abspath("${path.root}/services/backend")
   #nginx config mount path keeps reverse-proxy rules tracked in git
   frontend_config_path = abspath("${path.root}/services/frontend/default.conf")
   #static site path feeds directly into nginx html directory
   frontend_site_path = abspath("${path.root}/services/frontend/site")
+  #TODO: maybe move these paths to variables for more flexibility?
 }
 
 module "network" {

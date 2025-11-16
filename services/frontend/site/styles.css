@@ -3,12 +3,14 @@
   color-scheme: light dark;
   font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   line-height: 1.5;
+  /*--primary: #6366f1;  might use this later*/
 }
 
 body {
   margin: 0;
   background: #0f172a;  /*dark slate background*/
   color: #e2e8f0;
+  /*background: #1e293b;  alternative darker option*/
 }
 
 .app {
@@ -59,6 +61,7 @@ textarea {
 button {
   align-self: flex-start;
   background: linear-gradient(130deg, #6366f1, #8b5cf6);  /*purple gradient*/
+  /*background: #6366f1;  solid color alternative*/
   border: none;
   border-radius: 999px;
   color: white;
@@ -66,6 +69,7 @@ button {
   font-weight: 600;
   cursor: pointer;
   transition: transform 120ms ease;
+  /*hover state would be nice but whatever*/
 }
 
 button:active {

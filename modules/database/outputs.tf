@@ -6,5 +6,6 @@ output "container_name" {
 
 output "volume_name" {
   value = docker_volume.data.name
+  #volume output helps with debugging persistence issues
 }
 

@@ -3,6 +3,7 @@
 variable "frontend_image_name" {
   description = "Frontend image name"
   type = string
+  #could add validation but seems fine for now
 }
 
 variable "frontend_container_name" {
@@ -13,6 +14,7 @@ variable "frontend_container_name" {
 variable "frontend_host_port" {
   description = "Host port exposed for HTTP traffic"
   type = number
+  #default = 8080  #might move to default later
 }
 
 variable "shared_network_name" {

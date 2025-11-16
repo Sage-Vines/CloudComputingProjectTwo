@@ -2,5 +2,6 @@
 # surfaced as root output so curl commands stay straightforward
 output "container_name" {
   value = docker_container.this.name
+  #could output image_id too but probably not needed
 }
 

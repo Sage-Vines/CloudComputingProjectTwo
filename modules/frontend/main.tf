@@ -3,6 +3,7 @@
 resource "docker_image" "this" {
   name = var.frontend_image_name
   keep_locally = true
+  #could use pull_triggers here but not necessary
 }
 
 #runs nginx straight from registry, mounts config & site bundle

@@ -3,6 +3,7 @@
 output "network_name" {
   description = "Docker network hosting services"
   value = module.network.name
+  #could add more outputs but these are the important ones
 }
 
 output "backend_container" {

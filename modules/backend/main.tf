@@ -3,6 +3,7 @@
 resource "docker_image" "this" {
   name = var.backend_image_name
   keep_locally = true
+  #keep_locally = false  #might change this later to save space
 }
 
 #spins up python container, bind mounts app folder, runs start script
@@ -24,6 +25,7 @@ resource "docker_container" "this" {
   working_dir = "/app"
   ports {
     internal = var.backend_service_port
+    #external = 5000  #could expose externally but not needed
   }
 }
 

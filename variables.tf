@@ -4,6 +4,7 @@ variable "network_name" {
   description = "Custom Docker network"
   type = string
   default = "local-cloud"
+  #default = "my-cloud"  #alternative name
 }
 
 variable "network_subnet" {
@@ -16,6 +17,7 @@ variable "frontend_host_port" {
   description = "Host port exposed for frontend"
   type = number
   default = 8080
+  #default = 3000  #was testing different port
 }
 
 variable "backend_image" {
@@ -52,6 +54,7 @@ variable "database_password" {
   description = "Database password"
   type = string
   sensitive = true  #dont print this in logs
+  #validation blocks would be nice but not required
 }
 
 variable "database_volume_name" {

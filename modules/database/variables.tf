@@ -1,5 +1,6 @@
 #database inputs go here
 # root module translates human-readable terraform vars into postgres env vars
+#TODO: maybe add more postgres config options later?
 variable "database_container_name" {
   description = "Name of Postgres container"
   type = string
@@ -24,6 +25,7 @@ variable "database_user_password" {
   description = "Database password"
   type = string
   sensitive = true
+  #should probably validate length but whatever
 }
 
 variable "shared_network_name" {
