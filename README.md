@@ -53,5 +53,3 @@ This repo as a small “local cloud” that Terraform operates. It is just Terra
 ```powershell
 terraform destroy #Powershell command
 ```
-
-- This command essentially tears down containers, network, and the pulled images related to the note-taking app. The postgres-data Docker volume intentionally sticks around so you can spin the stack back up without losing notes—delete it manually if you want a totally clean slate.
