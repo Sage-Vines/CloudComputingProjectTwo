@@ -1,9 +1,8 @@
-#little helper to remind Terraform which docker provider flavor we trust
-#repeating this in each module keeps "hashicorp/docker" from sneaking back in
+#copied this from backend module, keeps things consistent
 terraform {
-  required_providers {
+  required_providers{
     docker = {
-      source = "kreuzwerker/docker"
+      source= "kreuzwerker/docker"
     }
   }
 }

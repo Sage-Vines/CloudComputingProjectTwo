@@ -1,9 +1,8 @@
-#declaring docker provider source
-#repeating this in every module keeps terraform from defaulting back to hashicorp/docker
+#need this so terraform knows which docker provider to grab
 terraform {
-  required_providers{
+  required_providers {
     docker = {
-      source ="kreuzwerker/docker"
+      source = "kreuzwerker/docker"
     }
   }
 }
