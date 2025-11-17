@@ -44,7 +44,7 @@ variable "container_image" {
   type = string
   default = "nginx:1.27-alpine"
 }
-#swap this if you wanna use httpd or caddy or whatever
+#swap this if you wanna use httpd or caddy
 
 variable "card_title" {
   description = "giant heading text at top of card."
