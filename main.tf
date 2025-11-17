@@ -13,7 +13,7 @@ terraform {
 #specifies kubeconfig path and context for cluster authenticatio
 provider "kubernetes" {
   config_path = var.kubeconfig_path
-  config_context = var.chatty_kube_context
+  config_context = var.kube_context
 }
 
 #labels that keep everything findable later
@@ -31,7 +31,7 @@ resource "kubernetes_namespace" "app" {
   metadata {
     name = var.namespace
     labels = {
-      environment = var.vibe_environment_tag
+      environment = var.environment_tag
     }
   }
 }
@@ -48,7 +48,7 @@ resource "kubernetes_config_map" "static_site" {
     "index.html" = templatefile("${path.module}/templates/index.html.tpl", {
       title = var.card_title
       message = var.card_message
-      env = var.vibe_environment_tag
+      env = var.environment_tag
       accent = var.accent_hex
       highlights = var.highlights
       bg_start = var.background_start

@@ -7,7 +7,7 @@ variable "kubeconfig_path" {
   default = "~/.kube/config"
 }
 
-variable "chatty_kube_context" {
+variable "kube_context" {
   description = "kube context we want terraform & kubectl provider thing to poke."
   type= string
   default = "kind-cloudcomp-cluster"
@@ -26,7 +26,7 @@ variable "app_name" {
   default = "static-site"
 }
 
-variable "vibe_environment_tag" {
+variable "environment_tag" {
   description = "quick little environment tag so dashboards look more organizd."
   type = string
   default = "dev"
