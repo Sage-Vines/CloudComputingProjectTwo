@@ -10,7 +10,7 @@ This repo as a small “local cloud” that Terraform operates. It is just Terra
 ## Requirements Satisfied
 
 - **Separate Modules** - network, database, backend, and frontend are their own Terraform modules, so root config just wires them together.
-- **docker_image / docker_container / docker_network** - each module uses the right resource types straight from the Docker provider, satisfying the spec.
+- **docker_image/docker_container/docker_network** - each module uses the right resource types straight from the Docker provider, satisfying the spec.
 - **Secrets** - database_password is only sensitive value and you feed it through terraform.tfvars Nothing secret lives within actual code.
 - **Frontend** - module variables pin port mapping, so SPA is always reachable on localhost:8080 without extra flags.
 - **Custom network & dependency graph** - every container joins module.network.name, and Terraform’s depends_on keeps creation order tidy.
