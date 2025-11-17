@@ -194,7 +194,7 @@ class Handler(BaseHTTPRequestHandler):
       #print(f"json error: {e}")  #debug
       self.send_json_response({"error": "bad json payload"}, status=400)
       return None
-    #should probably catch other exceptions too but whatever
+    #should probably catch other exceptions too
 
   def normalize_note_payload(self, payload):
     #extract & validate title/content, trim whitespace
