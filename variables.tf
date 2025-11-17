@@ -46,25 +46,25 @@ variable "container_image" {
 }
 #swap this if you wanna use httpd or caddy or whatever
 
-variable "hero_card_title" {
+variable "card_title" {
   description = "giant heading text at top of card."
   type = string
   default = "Cloud Computing Project - Kubernetes"
 }
 
-variable "hero_card_message" {
+variable "card_message" {
   description = "friendly subtitle that also ends up as APP_MESSAGE env var"
   type = string
   default = "Hello from Terraform-managed Kubernetes Cluster!"
 }
 
-variable "hero_accent_hex" {
+variable "accent_hex" {
   description = "primary accent hex color used for pills, button, etc"
   type = string
   default = "#2563eb"
 }
 
-variable "bragging_highlights" {
+variable "highlights" {
   description = "list of phrases that render as little rounded capsules"
   type = list(string)
   default = [
@@ -74,13 +74,13 @@ variable "bragging_highlights" {
   ]
 }
 
-variable "cozy_background_start" {
+variable "background_start" {
   description = "first color stop in big background gradient behind card"
   type = string
   default = "#f8fafc"
 }
 
-variable "cozy_background_end" {
+variable "background_end" {
   description = "second gradient color stop so background dosnt look flat"
   type = string
   default = "#e0f2fe"

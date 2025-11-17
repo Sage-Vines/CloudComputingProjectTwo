@@ -18,7 +18,7 @@ This repo spins up a tiny static site on a local kind cluster (https://kind.sigs
 
 ## How to run it
 
-1. Open terraform.tfvars & set values like kubeconfig_path, app_name, & hero_card_title
+1. Open terraform.tfvars & set values like kubeconfig_path, app_name, & card_title
 2. Run:
    ```powershell
    terraform init
@@ -36,7 +36,7 @@ This repo spins up a tiny static site on a local kind cluster (https://kind.sigs
 ## Enhancements
 
 - **ConfigMap content** - Terraform fills in templates/index.html.tpl
-  using whatever values chosen for hero_card_title, hero_card_message, and the list of blurbs. Updating the varfiables will update the pages automaticaly.
+  using whatever values chosen for card_title, card_message, and the list of blurbs. Updating the varfiables will update the pages automaticaly.
 
 - **Accent & highlight chips** - accent_hex and highlights
   control the pills without touching CSS.

@@ -46,13 +46,13 @@ resource "kubernetes_config_map" "static_site" {
 
   data = {
     "index.html" = templatefile("${path.module}/templates/index.html.tpl", {
-      title = var.hero_card_title
-      message = var.hero_card_message
+      title = var.card_title
+      message = var.card_message
       env = var.vibe_environment_tag
-      accent = var.hero_accent_hex
-      highlights = var.bragging_highlights
-      bg_start = var.cozy_background_start
-      bg_end = var.cozy_background_end
+      accent = var.accent_hex
+      highlights = var.highlights
+      bg_start = var.background_start
+      bg_end = var.background_end
       shadow = var.glowy_shadow_blur_size
       cta_label = var.handy_button_label_text
       cta_url = var.handy_button_url_link
@@ -95,7 +95,7 @@ resource "kubernetes_deployment" "app" {
 
           env {
             name = "APP_MESSAGE"
-            value = var.hero_card_message
+            value = var.card_message
           }
 
           resources {
