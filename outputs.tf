@@ -1,5 +1,4 @@
 #these outputs save us from typing kubectl describe every five seconds
-#copy/paste them straight into terminals during demos
 
 output "namespace" {
   description = "Namespace where the application is deployed."
