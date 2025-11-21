@@ -1,5 +1,5 @@
 #these outputs are like friendly reminders of what got made
-# they show up after terraform apply so you know which containers/URLs to poke
+# they show up after terraform apply so you know which containers/URLs to "poke"
 output "network_name" {
   description = "Docker network hosting services"
   value = module.network.name
